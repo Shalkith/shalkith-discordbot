@@ -82,12 +82,135 @@ async def on_message(message):
     else:
         pass
 
-    print(message.content.lower().startswith('!combat'))
+
+    if message.content.lower().startswith('!attack ') and message.channel.id == 645819212241043516:
+
+        owner,dragon1 = dragonlookup(message.author.id)
+        d2owner,dragon2 = enemylookup(dragon1)
+        print(dragon1,owner)
+        print(dragon2,d2owner)
+        canattack = attackstatus(dragon1)
+        if canattack == 'attacking' and owner != 'npc':
+            attacktime = False
+            if 'heal' in message.content.lower():
+                try:
+                    using,ess = message.content.lower().split(' ')[1],message.content.lower().split(' ')[2]
+                    int(ess)
+                except:
+                    using = ''
+                    await message.channel.send('```Improperly formatted heal command. Try !attack heal 3 \nWhere 3 is the Essence you with to use  ```')
+
+            else:
+                using = message.content.lower().split(' ',1)[1]
+
+            if using in availableskills:
+                attacktime = True
+                print('%s uses %s'% (dragon1,using))
+                if 'heal' == using:
+                    #print('%s spent %s essence'% (dragon1,ess))
+                    currlife,curress = lifeesscheck(dragon1)
+                    if int(ess) <2:
+                        text = "%s, the heal skill requires a minimum of 2 essence to use" % dragon1
+                        await message.channel.send('```'+text+'```')
+
+                    elif int(curress)<int(ess):
+                        text = "%s, you only have %s essence to spend" % (dragon1,curress)
+                        await message.channel.send('```'+text+'```')
+                    else:
+                        text = heal(owner,dragon1,currlife,ess)
+                        await message.channel.send('```'+text+'```')
+
+                else:
+                    if 'claw attack' in using:
+                        skill = clawattack(owner,dragon1)
+                        text = attack(owner,dragon1,d2owner,dragon2,skill[1],skill[2])
+                    if 'tail bash' in using:
+                        skill = tailbash(owner,dragon1)
+                        text = attack(owner,dragon1,d2owner,dragon2,skill[1],skill[2])
+                    if 'pass' in using:
+                        text = '%s passed and will get a bonus to defense rolls next combat' % dragon1
+                        await message.channel.send('```'+text+'```')
+
+                    else:
+                        await message.channel.send('```%s Attacks with %s: ' % (dragon1,using) +text+'```')
+
+
+###
+                canattack = attackstatus(dragon2)
+                print (d2owner,canattack)
+                if d2owner == 'npc' and canattack == 'attacking':
+                    currlife,curress = lifeesscheck(dragon2)
+                    #text = attack('npc',dragon2,'npc',dragon1,tailbash('npc',dragon2)[1])
+                    text = combatai(int(curress),int(currlife),'npc',dragon2,'npc',dragon1)
+                    await message.channel.send('```%s Attacks: ' % dragon2 +text+'```')
+                elif canattack == 'attacking':
+                    text = "<@%s> it's your turn to attack" % d2owner
+                    await message.channel.send('```'+text+'```')
+###
+
+            else:
+                print('%s uses unknown skill called %s'% (dragon1,using))
+            #input('pause here')
+            # testing fight
+        else:
+            await message.channel.send('```%s ' % dragon1.capitalize() +"it's not your turn to attack"+'```')
+            canattack = attackstatus(dragon2)
+            print (d2owner,canattack)
+            if d2owner == 'npc' and canattack == 'starting':
+                nextstep = 'Type !combat start to start the next round'
+                await message.channel.send('```'+nextstep+'```')
+            if d2owner == 'npc' and canattack == 'attacking':
+                currlife,curress = lifeesscheck(dragon2)
+                #text = attack('npc',dragon2,'npc',dragon1,tailbash('npc',dragon2)[1])
+                text = combatai(int(curress),int(currlife),'npc',dragon2,'npc',dragon1)
+                await message.channel.send('```%s Attacks: ' % dragon2 +text+'```')
+            elif canattack == 'attacking':
+                text = "<@%s> it's your turn to attack" % d2owner
+                await message.channel.send('```'+text+'```')
+
+    if message.content.lower().startswith('!move ') and message.channel.id == 645819212241043516:
+        newrange = message.content.upper().split('!MOVE ')[1]
+        print('newrange',newrange)
+        if newrange not in ['A','B','C','D','E']:
+            print('invalid location')
+        else:
+            owner,dname = dragonlookup(message.author.id)
+            adragon = dname
+            print('dragon!!!',adragon)
+            owner = str(message.author.id)
+            text,dragon2,dragon2owner = movedragon(owner,dname,newrange)
+            print(text)
+            await message.channel.send('```'+text+'```')
+            if 'moved to Range ' in text and dragon2owner == 'npc':
+                downer,d2name,dtext,davailablemoves = movecheck(dragon2,'-123')
+                from random import randrange
+                newrange = davailablemoves[randrange(0,len(davailablemoves))]
+                text,dragon2,dragon2owner = movedragon(downer,d2name,newrange)
+                if 'not time to move' in text:
+                    pass
+                else:
+                    await message.channel.send('```'+text+'```')
+
+##########
+
+
+
+
+            #attack next
+            print(adragon,d2name)
+            d1,d2 =attackcheck(adragon,d2name)
+            text = attack('npc',d1,'npc',d2,tailbash('npc',d1)[1])
+            await message.channel.send('``` %s Attacks: ' % d1 +text+'```')
+            text = attack('npc',d2,'npc',d1,tailbash('npc',d2)[1])
+            await message.channel.send('``` %s Attacks: ' % d2 +text+'```')
+
     if message.content.lower().startswith('!combat') and message.channel.id == 645819212241043516:
         print('testing')
         reply,status1,dragon1,status2,dragon2 = combatcommand(message)
+
+
         print(status1,dragon1,status2,dragon2)
-        if status1 == 'starting':
+        if status1 == 'starting' and status2 == 'starting':
             await message.channel.send(regainessence(dragon1,dragon2))
             #roll for random events
             time.sleep(.5)
@@ -98,7 +221,22 @@ async def on_message(message):
             await message.channel.send('```Random Events is a work in progress and is not ready yet```')
             #roll for initative
             await message.channel.send(initative(dragon1,dragon2))
+            #moving
+            downer,dname,dtext,davailablemoves = movecheck(dragon1,dragon2)
+            #await message.channel.send('```'+dtext+'\nAvailable locations:'+str(davailablemoves)+'```')
+            #await message.channel.send('```'++'```')
+            if downer != 'npc':
+                pass
+            else:
+                #await message.channel.send('```'+'I will move %s since its an NPC' % dname +'```')
+                downer,dname,dtext,davailablemoves = movecheck(dname,'-123')
+                from random import randrange
+                newrange = davailablemoves[randrange(0,len(davailablemoves))]
+                text,dragon2,dragon2owner = movedragon(downer,dname,newrange)
+                await message.channel.send('```'+text+'```')
 
+            downer,dname,dtext,davailablemoves = movecheck(dragon1,dragon2)
+            await message.channel.send('```'+dtext+'\nAvailable locations:'+str(davailablemoves)+'```')
 
         else:
             await message.channel.send(reply)

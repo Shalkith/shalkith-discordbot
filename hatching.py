@@ -74,7 +74,7 @@ def starthatch(message):
         if step == 'name':
             return 'Type !hatch name to name your dragon \n Example: !hatch Yanthas '
         elif step == 'complete':
-            return 'Type !hatch complete to join the battle'
+            return 'Type !hatch complete to join the Dragon ranks'
         elif step == 'breed':
             return 'Type !hatch breedtype to select your breed \n Example: \n!hatch Blue\n!hatch Red\n!hatch Brown\n!hatch Silver'
         elif step == 'advancement':

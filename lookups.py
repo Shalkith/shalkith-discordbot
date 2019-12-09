@@ -1,3 +1,88 @@
+def lifeesscheck(dragon):
+    import creds
+    import mysql.connector
+
+    u = creds.mysqlun # MySQL username
+    p = creds.mysqlpw # MySQL password
+    h = creds.mysqlhost # MySQL server
+    db = 'shalkith' # MySQL datanase name
+    cnx = mysql.connector.connect(user=u, password=p,host=h,database=db)
+    cursor = cnx.cursor(buffered=True)
+
+    query = ("select life,essence from combattable where name ='%s';" % dragon)
+    data = []
+    cursor.execute(query)
+    for x in cursor:
+            data.append(x)
+    return data[0][0],data[0][1]
+
+
+def attackstatus(dragon):
+    import creds
+    import mysql.connector
+
+    u = creds.mysqlun # MySQL username
+    p = creds.mysqlpw # MySQL password
+    h = creds.mysqlhost # MySQL server
+    db = 'shalkith' # MySQL datanase name
+    cnx = mysql.connector.connect(user=u, password=p,host=h,database=db)
+    cursor = cnx.cursor(buffered=True)
+
+    query = ("select rank from combattable where name ='%s';" % dragon)
+    data = []
+    cursor.execute(query)
+    for x in cursor:
+            data.append(x)
+    return data[0][0]
+
+
+
+def enemylookup(dragon1):
+    import creds
+    import mysql.connector
+
+    u = creds.mysqlun # MySQL username
+    p = creds.mysqlpw # MySQL password
+    h = creds.mysqlhost # MySQL server
+    db = 'shalkith' # MySQL datanase name
+    cnx = mysql.connector.connect(user=u, password=p,host=h,database=db)
+    cursor = cnx.cursor(buffered=True)
+
+    query = ("select combatstatus from combattable where name ='%s';" % dragon1)
+    data = []
+    cursor.execute(query)
+    for x in cursor:
+            data.append(x)
+
+    query = ("select owner from combattable where name ='%s';" % data[0][0])
+    ddata = []
+    cursor.execute(query)
+
+    for x in cursor:
+            ddata.append(x)
+    return ddata[0][0],data[0][0]
+
+
+def dragonlookup(owner):
+    import creds
+    import mysql.connector
+
+    u = creds.mysqlun # MySQL username
+    p = creds.mysqlpw # MySQL password
+    h = creds.mysqlhost # MySQL server
+    db = 'shalkith' # MySQL datanase name
+    cnx = mysql.connector.connect(user=u, password=p,host=h,database=db)
+    cursor = cnx.cursor(buffered=True)
+
+    query = ("select name,owner from dragons where owner ='%s' and retired = '0';" % owner)
+    data = []
+    cursor.execute(query)
+    for x in cursor:
+            data.append(x)
+    return data[0][1],data[0][0]
+
+
+
 def mydragon(owner):
     import creds
     import mysql.connector
