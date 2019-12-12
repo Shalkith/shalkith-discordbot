@@ -11,6 +11,12 @@ from combat import *
 #invite the bot
 #type the below command in discord to roll 10 dice (d10s only for exalted)
 #!roll 10
+combatrooms = [
+ 645819212241043516,
+ 645873095277805579,
+ 645873183118852106,
+ 645873246620614666
+ ]
 
 
 
@@ -83,7 +89,7 @@ async def on_message(message):
         pass
 
 
-    if message.content.lower().startswith('!attack ') and message.channel.id == 645819212241043516:
+    if message.content.lower().startswith('!attack ') and message.channel.id in combatrooms:
 
         owner,dragon1 = dragonlookup(message.author.id)
         d2owner,dragon2 = enemylookup(dragon1)
@@ -160,6 +166,7 @@ async def on_message(message):
                 nextstep = 'Type !combat start to start the next round'
                 await message.channel.send('```'+nextstep+'```')
             if d2owner == 'npc' and canattack == 'attacking':
+                print(dragon2,'is about to doing the fighting')
                 currlife,curress = lifeesscheck(dragon2)
                 #text = attack('npc',dragon2,'npc',dragon1,tailbash('npc',dragon2)[1])
                 text = combatai(int(curress),int(currlife),'npc',dragon2,'npc',dragon1)
@@ -168,7 +175,7 @@ async def on_message(message):
                 text = "<@%s> it's your turn to attack" % d2owner
                 await message.channel.send('```'+text+'```')
 
-    if message.content.lower().startswith('!move ') and message.channel.id == 645819212241043516:
+    if message.content.lower().startswith('!move ') and message.channel.id in combatrooms:
         newrange = message.content.upper().split('!MOVE ')[1]
         print('newrange',newrange)
         if newrange not in ['A','B','C','D','E']:
@@ -190,9 +197,7 @@ async def on_message(message):
                     pass
                 else:
                     await message.channel.send('```'+text+'```')
-
 ##########
-
 
 
 
@@ -204,7 +209,7 @@ async def on_message(message):
             text = attack('npc',d2,'npc',d1,tailbash('npc',d2)[1])
             await message.channel.send('``` %s Attacks: ' % d2 +text+'```')
 
-    if message.content.lower().startswith('!combat') and message.channel.id == 645819212241043516:
+    if message.content.lower().startswith('!combat') and message.channel.id in combatrooms:
         print('testing')
         reply,status1,dragon1,status2,dragon2 = combatcommand(message)
 

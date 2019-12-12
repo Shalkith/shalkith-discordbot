@@ -585,9 +585,15 @@ def newchallange(challanger,defender):
             cursor.execute(query)
             cnx.commit()
 
-            query = "update combattable set story='A' where name = '%s'" % (challanger.capitalize())
-            query2 = "update combattable set story='A' where name = '%s'" % (attacker.capitalize())
+            print('range test!!!',challanger,attacker)
+
+            query = "update combattable set story='A' where name = '%s'" % (challanger)
+            query2 = "update combattable set story='A' where name = '%s'" % (attacker)
+
             cursor.execute(query)
+            cnx.commit()
+
+            cursor.execute(query2)
             cnx.commit()
 
 
